@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
     // Min. offset from the TOP to show header in any case.
     private val MIN_OFFSET_TO_TOP = 10
     // Offset that user have to scroll DOWN to start  header expansion.
-    private val MIN_OFFSET_TO_SHOW_HEADER = 250
+    private val MIN_OFFSET_TO_SHOW_HEADER = 200
     // Header collapsing / expansion.
     private val ANIMATION_DURATION = 150L
     // Makes change smoothly.
