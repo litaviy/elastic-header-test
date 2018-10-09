@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="header_min_h">50dp</dimen>
+    <dimen name="header_min_w">150dp</dimen>
     <dimen name="item_padding">20dp</dimen>
 </resources>
