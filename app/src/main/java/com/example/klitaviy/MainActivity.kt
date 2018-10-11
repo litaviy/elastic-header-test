@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.LinearSmoothScroller
+import android.support.v7.widget.RecyclerView
 import android.util.Log
 import com.example.klitaviy.collapseditemtest.R
 import com.example.klitaviy.fragment.ElasticHeaderFragment
@@ -18,7 +20,7 @@ class MainActivity : AppCompatActivity() {
     // Min. offset from the TOP to show header in any case.
     private val MIN_OFFSET_TO_TOP = 10
     // Offset that user have to scroll DOWN to start  header expansion.
-    private val MIN_OFFSET_TO_SHOW_HEADER = 150
+    private val MIN_OFFSET_TO_SHOW_HEADER = 100
     // Header collapsing / expansion.
     private val ANIMATION_DURATION = 150L
     // Makes change smoothly.
@@ -30,15 +32,27 @@ class MainActivity : AppCompatActivity() {
 
         val headerLayoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         headerRecyclerView.layoutManager = headerLayoutManager
-        headerRecyclerView.adapter = MyAdapter(R.layout.header_item_layout, "Header", 20)
-//        val snapHelper = StartLinearSnapHelper()
-//        snapHelper.attachToRecyclerView(headerRecyclerView)
+        val data: MutableList<String> = MutableList(10) {
+            "Header :  ${it + 1}"
+        }
+        val adapter = MyAdapter(data) { position ->
+            contentViewPager.setCurrentItem(position, true)
+        }
+        headerRecyclerView.adapter = adapter
+
+        val snapHelper = StartLinearSnapHelper()
+        snapHelper.attachToRecyclerView(headerRecyclerView)
 
         val collapsedHeaderHeight = resources.getDimensionPixelSize(R.dimen.header_min_h)
         val expandedHeaderHeight = collapsedHeaderHeight * 2
         val halfExpandedHeaderHeight = collapsedHeaderHeight + (collapsedHeaderHeight / 2)
         var currentHeight = expandedHeaderHeight
-        val headerItemWidth = resources.getDimensionPixelSize(R.dimen.header_min_w)
+
+        val smoothScroller: RecyclerView.SmoothScroller = object : LinearSmoothScroller(this) {
+            override fun getHorizontalSnapPreference(): Int {
+                return SNAP_TO_START
+            }
+        }
 
         headerRecyclerView.afterMeasure {
             this.changeHeight(expandedHeaderHeight)
@@ -107,13 +121,13 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-                val headerOffset = (headerItemWidth / contentViewPager.width) * positionOffsetPixels
-//                log("headerOffset : $headerOffset")
-//                headerLayoutManager.offsetChildrenHorizontal(headerOffset)
-//                headerLayoutManager.scrollHorizontallyBy(headerItemWidth, headerRecyclerView.Recycler(), headerRecyclerView.scrollState)
             }
 
             override fun onPageSelected(position: Int) {
+                log("$position")
+                adapter.selectItem(position)
+                smoothScroller.targetPosition = position
+                headerLayoutManager.startSmoothScroll(smoothScroller)
             }
         })
     }
